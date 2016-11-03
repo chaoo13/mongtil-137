@@ -5,6 +5,7 @@ from flask import jsonify
 from flask import render_template
 from flask import json
 import KoreanName
+from gmail import mail_list_read, mail_list_unread
 
 app = Flask(__name__)
 
@@ -36,6 +37,16 @@ def lovescore():
         return result
     else:
         return render_template('lovescore.html')
+
+
+@app.route("/maillist", methods=['POST', 'GET'])
+def maillist():
+    if request.method == 'POST':
+        text = request.form['text']
+        subjects = mail_list_read(text)
+        return ",".join(subject for subject in subjects)
+    else:
+        return render_template('maillist.html')
 
 
 if __name__ == '__main__':
