@@ -1,0 +1,5 @@
+cron:
+- description: "daily estate report job"
+  url: /estatenews
+  schedule: every day 09:10
+  timezone: Asia/Seoul
