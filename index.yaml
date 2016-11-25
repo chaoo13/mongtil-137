@@ -1,0 +1,10 @@
+indexes:
+
+- kind: AirRoute
+  ancestor: no
+  properties:
+  - name: to_airport
+  - name: from_airport
+  - name: to_city
+  - name: airline
+    direction: desc

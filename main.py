@@ -1,11 +1,14 @@
-# -*- coding:utf-8 -*-
+# -*- coding:cp949 -*-
 from flask import Flask
 from flask import request
-from flask import jsonify
 from flask import render_template
-from flask import json
 import KoreanName
-from gmail import mail_list_read, mail_list_unread
+import dailyNews
+import dailyStock
+import datetime
+import Route
+# import NewsScrapy
+
 
 app = Flask(__name__)
 
@@ -39,14 +42,70 @@ def lovescore():
         return render_template('lovescore.html')
 
 
-@app.route("/maillist", methods=['POST', 'GET'])
-def maillist():
+@app.route("/estatenews")
+def estatenews():
+    dailyNews.get_daily_news("부동산")
+    return "부동산"
+
+
+@app.route("/kospi")
+def kospi():
+    if datetime.datetime.today().weekday() < 5:
+        dailyStock.get_kospi()
+    return "kospi"
+
+
+@app.route("/kospisum")
+def kospisum():
+    if datetime.datetime.today().weekday() < 5:
+        dailyStock.get_kospi_summary()
+    return "kospi_summary"
+
+
+@app.route("/kosdacsum")
+def kosdacsum():
+    if datetime.datetime.today().weekday() < 5:
+        dailyStock.get_kosdac_summary()
+    return "kosdac_summary"
+
+
+@app.route("/uploadairport",  methods=['GET'])
+def uploadairport():
+    from_airport = request.args.get('from_airport')
+    airline = request.args.get('airline')
+    to_airport = request.args.get('to_airport')
+    to_city = request.args.get('to_city')
+    Route.input_route(from_airport=from_airport, airline=airline, to_airport=to_airport, to_city=to_city)
+
+    # route = Route(from_airport=unicode(from_airport), airline=airline, to_airport=to_airport, to_city=to_city)
+    # route.put()
+    return from_airport
+
+
+# @app.route("/airlinequeue")
+# def airlinequeue():
+#     task = taskqueue.add(
+#         url='/updateairline',
+#         target='worker'
+#     )
+#     return "update"
+#
+# @app.route("/updateairline")
+# def updateairline():
+#     airline.get_airline()
+#     return "update"
+
+
+@app.route("/dailynews", methods=['POST', 'GET'])
+def dailynews():
     if request.method == 'POST':
-        text = request.form['text']
-        subjects = mail_list_read(text)
-        return ",".join(subject for subject in subjects)
+        text = request.form['text'].encode('cp949')
+        dailyNews.get_daily_news(text)
+        # result = text.encode('UTF-8')
+
+        return text
     else:
-        return render_template('maillist.html')
+        return render_template('dailynews.html')
 
 
 if __name__ == '__main__':
